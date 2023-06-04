@@ -1,0 +1,63 @@
+{% extends 'posts/base.html' %}
+{% load static %}
+
+{% block content %}
+    <main>
+        <div class="container mt-4 text-center">
+            <h1>{{ post.title }}</h1>
+            <div class="w-75 mx-auto">
+                <div class="card mt-4 post">
+                    <div class="card-body">
+                      {% if post.img %}
+                            <img src="{{ post.img.url }}" alt="img" height="400px" width="400px">
+                      {% endif %}
+                      <div>
+                        {{ post.text }}
+                      </div>
+                      <ul class="w-75 mt-3 mb-0 mx-auto list-out">
+                        <li><img src="{% if request.user.img %} {{ post.user.img.url }} {% else %} {% static 'img/1.jpg' %} {% endif %}" alt="img" height="40px" width="40px"></li>
+                        <li class="pt-2"><h6>{{ post.user }}</h6></li>
+                        <li class="pt-2">
+                            <ul class="list-in">
+                                <li><i class="fa-regular fa-comment"></i></li>
+                                <li><p>{{ post.comment_post.count }}</p></li>
+                            </ul>
+                        </li>
+                        <li class="pt-2">
+                            <ul class="list-in">
+                                <li><a href="{% if request.user.is_authenticated %} {% url 'posts:like' post.pk %} {% else %} # {% endif %}"><i class="fa-regular fa-heart"></i></a></li>
+                                <li><p>{{ post.like_post.count }}</p></li>
+                            </ul>
+                        </li>
+                        <li class="pt-2">{{ post.date }}</li>
+                      </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if request.user.is_authenticated %}
+            <form class="w-50 mt-3 mx-auto" action="{% url 'posts:detail' post.pk %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3 mx-auto text-center">
+                  <label for="{{ form.text.id_for_label }}" class="form-label">Оставить комментарий</label>
+                  {{ form.text }}
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+
+            </form>
+        {% endif %}
+        <div class="w-50 mx-auto">
+            {% for comment in post.comment_post.all %}
+                <div class="card mt-4 mb-3 comment">
+                    <div class="card-body">
+                      <div>
+                          {{ comment.text }}
+                      </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock %}
